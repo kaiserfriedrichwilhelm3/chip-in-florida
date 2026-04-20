@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galen · Live Exam Demo · ARX Systems</title>
+<style>
+  :root {
+    --obsidian: #0A0A0A;
+    --surface: #111111;
+    --surface-2: #141414;
+    --surface-3: #1a1a1a;
+    --border: #222222;
+    --border-strong: #333333;
+    --white: #FAFAFA;
+    --muted: #888888;
+    --muted-2: #666666;
+    --muted-3: #555555;
+    --gold: #D4AF37;
+    --gold-dim: #a88828;
+    --galen: #4A9EFF;
+    --galen-dim: #2d6bb8;
+    --success: #22C55E;
+    --danger: #FF4444;
+    --font-serif: Georgia, 'Times New Roman', serif;
+    --font-mono: 'Courier New', 'Courier', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    background: var(--obsidian);
+    color: var(--white);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body {
+    padding: 20px;
+    background-image:
+      radial-gradient(circle at 20% 30%, rgba(74,158,255,0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(212,175,55,0.02) 0%, transparent 50%);
+  }
+
+  /* ============ BROWSER CHROME ============ */
+  .window {
+    max-width: 1520px;
+    margin: 0 auto;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .title-bar {
+    background: var(--surface-2);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .traffic-lights { display: flex; gap: 7px; }
+  .traffic-lights span {
+    width: 12px; height: 12px; border-radius: 50%;
+  }
+  .tl-red { background: #FF5F57; }
+  .tl-yellow { background: #FEBC2E; }
+  .tl-green { background: #28C840; }
+  .url-bar {
+    flex: 1;
+    background: var(--obsidian);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    padding: 5px 12px;
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .url-lock {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    border: 1.2px solid var(--galen);
+    position: relative;
+  }
+  .url-lock::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 0px;
+    width: 6px; height: 4px;
+    border-left: 1.2px solid var(--galen);
+    border-bottom: 1.2px solid var(--galen);
+    transform: rotate(-45deg);
+  }
+
+  /* ============ APP HEADER ============ */
+  .app-header {
+    background: var(--obsidian);
+    border-bottom: 0.5px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    width: 24px; height: 28px;
+    position: relative;
+  }
+  .brand-mark::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 16px; height: 22px;
+    border: 2px solid var(--gold);
+    border-radius: 8px 8px 8px 8px / 10px 10px 14px 14px;
+    border-bottom: none;
+  }
+  .brand-mark::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 4px;
+    width: 8px; height: 8px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+  }
+  .brand-text h1 {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+  }
+  .brand-text small {
+    font-size: 9px;
+    color: var(--muted-2);
+    letter-spacing: 2px;
+  }
+
+  nav { display: flex; gap: 28px; }
+  nav a {
+    font-size: 11px;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 2px;
+    padding: 6px 0;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  nav a:hover { color: var(--white); }
+  nav a.active { color: var(--galen); border-bottom-color: var(--galen); }
+
+  .header-status {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .chip {
+    background: var(--obsidian);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--white);
+  }
+  .chip-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+  }
+  .avatar {
+    width: 28px; height: 28px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-serif);
+    font-weight: bold;
+    font-size: 11px;
+    color: var(--gold);
+    background: var(--surface-2);
+  }
+
+  /* ============ SUB-HEADER ============ */
+  .sub-header {
+    background: #0f0f0f;
+    border-bottom: 0.5px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .patient-info .label {
+    font-size: 9px;
+    color: var(--muted-2);
+    letter-spacing: 3px;
+    margin-bottom: 6px;
+  }
+  .patient-info .name {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 700;
+    display: inline;
+  }
+  .patient-info .meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  .patient-info .hx {
+    font-size: 11px;
+    color: var(--galen);
+    margin-left: 8px;
+  }
+  .provider-info {
+    text-align: right;
+    font-size: 10px;
+  }
+  .provider-info .label {
+    color: var(--muted-2);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+  .provider-info .name { color: var(--white); }
+
+  /* ============ MAIN LAYOUT ============ */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    min-height: 740px;
+  }
+  .panel {
+    padding: 24px 32px;
+  }
+  .panel.left {
+    border-right: 1px solid var(--border);
+  }
+  .panel-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .panel-label.live { color: var(--gold); }
+  .panel-label.confirmed { color: var(--success); }
+  .panel-label.pending { color: var(--muted-2); }
+
+  .live-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+  .live-dot.pulse {
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* ============ CARDS ============ */
+  .card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+  }
+  .card + .card { margin-top: 16px; }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 10px;
+    color: var(--muted-2);
+    letter-spacing: 2px;
+  }
+  .card-meta {
+    font-size: 10px;
+    color: var(--muted-2);
+  }
+
+  /* ============ WAVEFORM ============ */
+  .waveform-wrap {
+    position: relative;
+    height: 200px;
+  }
+  canvas.waveform {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .wave-indicator {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+  }
+  .wave-indicator.streaming { color: var(--galen); }
+  .wave-indicator.idle { color: var(--muted-2); }
+  .rec-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--danger);
+  }
+  .rec-dot.blink { animation: pulse 1s infinite; }
+
+  /* ============ STAT ROW ============ */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .stat-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px;
+  }
+  .stat-label {
+    font-size: 9px;
+    color: var(--muted-2);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .stat-value {
+    font-family: var(--font-serif);
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1;
+  }
+  .stat-unit {
+    font-size: 11px;
+    color: var(--muted-2);
+    margin-left: 4px;
+  }
+  .stat-extra {
+    font-size: 9px;
+    color: var(--muted-2);
+    margin-top: 8px;
+    font-family: var(--font-mono);
+  }
+  .stat-extra.good { color: var(--success); }
+  .quality-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .quality-bar-fill {
+    height: 100%;
+    background: var(--success);
+    width: 84%;
+    border-radius: 2px;
+    transition: width 0.4s;
+  }
+
+  /* ============ ML INFERENCE PANEL ============ */
+  .ml-card {
+    border-color: var(--gold);
+    border-width: 1.5px;
+    margin-top: 16px;
+  }
+  .ml-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  .ml-title {
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 3px;
+  }
+  .ml-status {
+    font-size: 10px;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ml-status.processing { color: var(--galen); }
+  .ml-status.complete { color: var(--success); }
+  .ml-status.idle { color: var(--muted-2); }
+  .ml-status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .ml-status.processing .ml-status-dot { animation: pulse 0.8s infinite; }
+  .ml-subtitle {
+    font-size: 9px;
+    color: var(--muted-2);
+    margin-bottom: 16px;
+  }
+
+  .prob-row {
+    display: grid;
+    grid-template-columns: 140px 1fr 40px;
+    gap: 14px;
+    align-items: center;
+    margin: 10px 0;
+  }
+  .prob-label {
+    font-size: 11px;
+    color: var(--white);
+  }
+  .prob-bar {
+    height: 14px;
+    background: var(--obsidian);
+    border: 0.5px solid var(--border);
+    border-radius: 2px;
+    position: relative;
+    overflow: hidden;
+  }
+  .prob-bar-fill {
+    height: 100%;
+    background: var(--muted-3);
+    width: 0;
+    transition: width 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+    border-radius: 2px;
+  }
+  .prob-bar-fill.highlight {
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+  }
+  .prob-value {
+    font-size: 11px;
+    color: var(--muted);
+    text-align: right;
+  }
+  .prob-value.highlight {
+    color: var(--gold);
+    font-weight: bold;
+  }
+
+  .ml-footer {
+    border-top: 1px solid var(--border);
+    margin-top: 14px;
+    padding-top: 14px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .ml-footer-item .label {
+    font-size: 9px;
+    color: var(--muted-2);
+    margin-bottom: 4px;
+  }
+  .ml-footer-item .value {
+    font-size: 11px;
+    color: var(--white);
+  }
+  .ml-footer-item .value.good { color: var(--success); }
+
+  /* ============ RIGHT PANEL — FINDING ============ */
+  .finding-card {
+    border-color: var(--success);
+    border-width: 1.5px;
+    transition: border-color 0.5s, opacity 0.5s;
+  }
+  .finding-card.idle {
+    border-color: var(--border);
+    opacity: 0.5;
+  }
+  .finding-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .finding-label {
+    font-size: 10px;
+    color: var(--success);
+    letter-spacing: 2px;
+    transition: color 0.5s;
+  }
+  .finding-card.idle .finding-label { color: var(--muted-2); }
+  .finding-timestamp {
+    font-size: 10px;
+    color: var(--muted-2);
+    letter-spacing: 2px;
+    text-align: right;
+  }
+  .finding-timestamp .provider {
+    color: var(--white);
+    display: block;
+    margin-top: 4px;
+  }
+  .finding-headline {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--white);
+    margin: 16px 0 8px;
+    min-height: 32px;
+    transition: opacity 0.5s;
+  }
+  .finding-card.idle .finding-headline {
+    color: var(--muted-3);
+    font-style: italic;
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .finding-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 16px;
+    min-height: 18px;
+  }
+  .finding-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .rec-chip {
+    background: rgba(212,175,55,0.08);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 8px 14px;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .rec-chip:hover {
+    background: rgba(212,175,55,0.15);
+  }
+  .override-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 12px;
+    background: var(--obsidian);
+    border: 0.5px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .override-toggle:hover { border-color: var(--border-strong); }
+  .override-toggle span {
+    font-size: 10px;
+    color: var(--white);
+  }
+  .toggle-switch {
+    width: 32px; height: 16px;
+    background: var(--border);
+    border-radius: 8px;
+    position: relative;
+    transition: background 0.2s;
+  }
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--muted-2);
+    transition: left 0.2s, background 0.2s;
+  }
+  .override-toggle.active .toggle-switch {
+    background: var(--danger);
+  }
+  .override-toggle.active .toggle-switch::after {
+    left: 18px;
+    background: var(--white);
+  }
+  .finding-note {
+    font-size: 10px;
+    color: var(--muted-2);
+    font-style: italic;
+  }
+
+  /* ============ FHIR JSON ============ */
+  .fhir-card {
+    margin-top: 16px;
+    background: var(--obsidian);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: opacity 0.5s;
+  }
+  .fhir-card.idle { opacity: 0.4; }
+  .fhir-header {
+    background: var(--surface-2);
+    padding: 10px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .fhir-title {
+    font-size: 10px;
+    color: var(--galen);
+    letter-spacing: 2px;
+  }
+  .fhir-meta {
+    font-size: 10px;
+    color: var(--muted-2);
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .fhir-meta .synced { color: var(--success); }
+  .copy-btn {
+    background: var(--obsidian);
+    border: 0.5px solid var(--border);
+    border-radius: 3px;
+    padding: 3px 8px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--muted);
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .copy-btn:hover { color: var(--white); border-color: var(--border-strong); }
+  .copy-btn.copied { color: var(--success); border-color: var(--success); }
+
+  .fhir-body {
+    padding: 16px 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+    max-height: 380px;
+    overflow-y: auto;
+  }
+  .fhir-body::-webkit-scrollbar { width: 6px; }
+  .fhir-body::-webkit-scrollbar-track { background: var(--obsidian); }
+  .fhir-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .json-key { color: var(--muted); }
+  .json-string { color: var(--gold); }
+  .json-number { color: var(--gold); }
+  .json-brace { color: var(--muted-2); }
+  .indent-1 { padding-left: 16px; }
+  .indent-2 { padding-left: 32px; }
+
+  /* ============ CONTROL BAR ============ */
+  .control-bar {
+    position: sticky;
+    bottom: 0;
+    background: var(--surface-2);
+    border-top: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .control-left {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--white);
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--obsidian);
+    font-weight: bold;
+  }
+  .btn-primary:hover {
+    background: #e8c347;
+  }
+  .btn-primary:disabled {
+    background: var(--border);
+    color: var(--muted-2);
+    cursor: not-allowed;
+  }
+  .btn-ghost {
+    border-color: var(--border);
+    color: var(--muted);
+  }
+  .btn-ghost:hover {
+    border-color: var(--border-strong);
+    color: var(--white);
+  }
+  .control-status {
+    font-size: 10px;
+    color: var(--muted-2);
+    letter-spacing: 2px;
+  }
+  .control-status strong {
+    color: var(--white);
+    font-weight: normal;
+  }
+  .control-right {
+    font-size: 10px;
+    color: var(--muted-2);
+    letter-spacing: 2px;
+    text-align: right;
+  }
+  .control-right .brand-mini {
+    color: var(--gold);
+    margin-right: 8px;
+  }
+
+  /* ============ RESPONSIVE ============ */
+  @media (max-width: 1200px) {
+    .main { grid-template-columns: 1fr; }
+    .panel.left { border-right: none; border-bottom: 1px solid var(--border); }
+  }
+  @media (max-width: 720px) {
+    body { padding: 8px; }
+    .panel { padding: 16px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .ml-footer { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    nav { display: none; }
+    .header-status .chip:first-child { display: none; }
+    .app-header { padding: 14px 16px; gap: 16px; }
+    .sub-header { padding: 14px 16px; flex-direction: column; align-items: flex-start; gap: 10px; }
+    .provider-info { text-align: left; }
+    .finding-actions { flex-direction: column; align-items: stretch; }
+  }
+</style>
+</head>
+<body>
+
+<div class="window">
+
+  <!-- ============ BROWSER CHROME ============ -->
+  <div class="title-bar">
+    <div class="traffic-lights">
+      <span class="tl-red"></span>
+      <span class="tl-yellow"></span>
+      <span class="tl-green"></span>
+    </div>
+    <div class="url-bar">
+      <div class="url-lock"></div>
+      <span>galen.arxsystems.org/exam/enc-2040198</span>
+    </div>
+  </div>
+
+  <!-- ============ APP HEADER ============ -->
+  <div class="app-header">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        <h1>Galen</h1>
+        <small>CLINICAL AI · ARX</small>
+      </div>
+    </div>
+    <nav>
+      <a href="#">DASHBOARD</a>
+      <a href="#" class="active">EXAMS</a>
+      <a href="#">PATIENTS</a>
+      <a href="#">INSIGHTS</a>
+      <a href="#">FHIR LOG</a>
+    </nav>
+    <div class="header-status">
+      <div class="chip">
+        <div class="chip-dot"></div>
+        <span>DEVICE · PAIRED</span>
+      </div>
+      <div class="chip">
+        <div class="chip-dot"></div>
+        <span>FHIR · SYNCED</span>
+      </div>
+      <div class="avatar">EC</div>
+    </div>
+  </div>
+
+  <!-- ============ SUB-HEADER ============ -->
+  <div class="sub-header">
+    <div class="patient-info">
+      <div class="label">PATIENT · ENCOUNTER 2040198</div>
+      <div>
+        <div class="name">M. Johnson</div>
+        <span class="meta">· 64 y/o M · MRN 88420</span>
+        <span class="hx">· Hx: HTN, T2DM</span>
+      </div>
+    </div>
+    <div class="provider-info">
+      <div class="label">PROVIDER · AUSCULTATION</div>
+      <div class="name">Dr. E. Cespedes, MD · Cardiology</div>
+    </div>
+  </div>
+
+  <!-- ============ MAIN ============ -->
+  <div class="main">
+
+    <!-- =============== LEFT PANEL =============== -->
+    <div class="panel left">
+      <div class="panel-label live" id="leftLabel">
+        <div class="live-dot" id="liveDot"></div>
+        <span id="leftLabelText">IDLE · READY</span>
+      </div>
+
+      <!-- Waveform card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">PHONOCARDIOGRAM · 24-bit · 4 kHz</div>
+        </div>
+        <div class="waveform-wrap">
+          <canvas class="waveform" id="waveform"></canvas>
+          <div class="wave-indicator idle" id="waveIndicator">
+            <span id="timestamp">00:00:00 · idle</span>
+            <div class="rec-dot" id="recDot" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">HEART RATE</div>
+          <div><span class="stat-value" id="statHR">—</span><span class="stat-unit">bpm</span></div>
+          <div class="stat-extra good" id="hrExtra">awaiting signal</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">RHYTHM</div>
+          <div class="stat-value" style="font-size:18px" id="statRhythm">—</div>
+          <div class="stat-extra" id="rhythmExtra">awaiting signal</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">SIGNAL QUALITY</div>
+          <div><span class="stat-value" id="statSNR">—</span><span class="stat-unit">dB</span></div>
+          <div class="quality-bar"><div class="quality-bar-fill" id="snrBar" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">DEVICE</div>
+          <div style="font-family:var(--font-mono);font-size:14px;color:var(--white)" id="statBatt">BATT 91%</div>
+          <div class="stat-extra" id="battExtra">NPU TEMP · 38.2°C<br>BLE RSSI · -52 dBm</div>
+        </div>
+      </div>
+
+      <!-- ML card -->
+      <div class="card ml-card">
+        <div class="ml-header">
+          <div class="ml-title">ON-DEVICE AI INFERENCE</div>
+          <div class="ml-status idle" id="mlStatus">
+            <div class="ml-status-dot"></div>
+            <span id="mlStatusText">IDLE</span>
+          </div>
+        </div>
+        <div class="ml-subtitle">Model: galen-pcg-v0.3.1 · quantized INT8 · Cortex-M55 + Ethos-U55</div>
+
+        <div class="prob-row">
+          <div class="prob-label">Normal</div>
+          <div class="prob-bar"><div class="prob-bar-fill" id="p0"></div></div>
+          <div class="prob-value" id="p0v">0.00</div>
+        </div>
+        <div class="prob-row">
+          <div class="prob-label">Systolic murmur</div>
+          <div class="prob-bar"><div class="prob-bar-fill" id="p1"></div></div>
+          <div class="prob-value" id="p1v">0.00</div>
+        </div>
+        <div class="prob-row">
+          <div class="prob-label">Diastolic murmur</div>
+          <div class="prob-bar"><div class="prob-bar-fill" id="p2"></div></div>
+          <div class="prob-value" id="p2v">0.00</div>
+        </div>
+        <div class="prob-row">
+          <div class="prob-label">Atrial fib</div>
+          <div class="prob-bar"><div class="prob-bar-fill" id="p3"></div></div>
+          <div class="prob-value" id="p3v">0.00</div>
+        </div>
+        <div class="prob-row">
+          <div class="prob-label">S3 gallop</div>
+          <div class="prob-bar"><div class="prob-bar-fill" id="p4"></div></div>
+          <div class="prob-value" id="p4v">0.00</div>
+        </div>
+
+        <div class="ml-footer">
+          <div class="ml-footer-item">
+            <div class="label">inference</div>
+            <div class="value good" id="inferTime">— ms</div>
+          </div>
+          <div class="ml-footer-item">
+            <div class="label">power</div>
+            <div class="value good" id="powerDraw">— mW</div>
+          </div>
+          <div class="ml-footer-item">
+            <div class="label">model size</div>
+            <div class="value">2.1 MB</div>
+          </div>
+          <div class="ml-footer-item">
+            <div class="label">cloud calls</div>
+            <div class="value good">0</div>
+          </div>
+          <div class="ml-footer-item">
+            <div class="label">PHI transmitted</div>
+            <div class="value good">none</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============== RIGHT PANEL =============== -->
+    <div class="panel right">
+      <div class="panel-label pending" id="rightLabel">
+        <span id="rightLabelText">⦿ PENDING FINDING</span>
+      </div>
+
+      <!-- Finding card -->
+      <div class="card finding-card idle" id="findingCard">
+        <div class="finding-header">
+          <div class="finding-label" id="findingLabel">AWAITING INFERENCE</div>
+          <div class="finding-timestamp" id="findingTimestamp" style="display:none">
+            <span id="findingTime">—</span>
+            <span class="provider">Dr. E. Cespedes, MD</span>
+          </div>
+        </div>
+        <div class="finding-headline" id="findingHeadline">Start an exam to begin auscultation...</div>
+        <div class="finding-sub" id="findingSub"></div>
+        <div class="finding-actions" id="findingActions" style="display:none">
+          <button class="rec-chip">→ RECOMMEND ECHOCARDIOGRAM</button>
+          <div class="override-toggle" id="overrideToggle">
+            <span>Override finding</span>
+            <div class="toggle-switch"></div>
+          </div>
+        </div>
+        <div class="finding-note" id="findingNote" style="display:none">
+          Auto-flagged for follow-up · cardiology note drafted · awaiting signature
+        </div>
+      </div>
+
+      <!-- FHIR JSON card -->
+      <div class="fhir-card idle" id="fhirCard">
+        <div class="fhir-header">
+          <div class="fhir-title">FHIR R4 · Observation.json</div>
+          <div class="fhir-meta">
+            <span id="fhirSize">size: — bytes</span>
+            <span class="synced" id="fhirSynced" style="display:none">✓ synced to EHR</span>
+            <button class="copy-btn" id="copyBtn">COPY</button>
+          </div>
+        </div>
+        <div class="fhir-body"><pre id="fhirBody" style="font-family:inherit;color:var(--muted-2);font-style:italic">No finding yet. Start an exam to generate the FHIR Observation.</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CONTROL BAR ============ -->
+  <div class="control-bar">
+    <div class="control-left">
+      <button class="btn btn-primary" id="startBtn">▶ START EXAM</button>
+      <button class="btn btn-ghost" id="resetBtn">RESET</button>
+      <div class="control-status">STATUS · <strong id="statusText">ready</strong></div>
+    </div>
+    <div class="control-right">
+      <span class="brand-mini">GALEN · ARXSYSTEMS.ORG</span>
+      zero patient audio transmitted · zero cloud inference calls
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// GALEN LIVE EXAM DEMO — simulated 15-second encounter
+// ============================================================
+
+const STATE = {
+  IDLE: 'idle',
+  ACQUIRING: 'acquiring',
+  INFERRING: 'inferring',
+  CONFIRMED: 'confirmed',
+};
+
+let currentState = STATE.IDLE;
+let examStartTime = 0;
+let animationFrame = null;
+
+// ============ WAVEFORM ENGINE ============
+const canvas = document.getElementById('waveform');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+}
+resizeCanvas();
+window.addEventListener('resize', () => { resizeCanvas(); drawWaveform(); });
+
+// Pre-generated PCG waveform: S1/S2 beats with a subtle systolic murmur
+// Each cycle ≈ 770ms (78 bpm). Murmur = low-amplitude oscillation between S1 and S2.
+function pcgValue(t) {
+  // t is seconds since start of exam
+  const cycleLen = 0.77;  // seconds per heartbeat
+  const phase = (t % cycleLen) / cycleLen;
+
+  let v = 0;
+
+  // S1 (lub) — sharp narrow spike at phase ~0
+  if (phase < 0.08) {
+    v += Math.sin(phase / 0.08 * Math.PI) * 0.85 * Math.exp(-phase * 30);
+    // High-freq content
+    v += Math.sin(phase * 180) * 0.15 * Math.exp(-phase * 25);
+  }
+
+  // Systolic murmur — low amplitude oscillation between S1 and S2
+  if (phase > 0.1 && phase < 0.38) {
+    const murmurPhase = (phase - 0.1) / 0.28;
+    // Diamond-shaped envelope (crescendo-decrescendo)
+    const envelope = Math.sin(murmurPhase * Math.PI);
+    v += envelope * 0.3 * (Math.sin(phase * 220) + Math.sin(phase * 260) * 0.6);
+  }
+
+  // S2 (dub) — sharp narrow spike at phase ~0.4
+  if (phase > 0.4 && phase < 0.48) {
+    const p = phase - 0.4;
+    v += Math.sin(p / 0.08 * Math.PI) * 0.7 * Math.exp(-p * 30);
+    v += Math.sin(p * 160) * 0.12 * Math.exp(-p * 25);
+  }
+
+  // Background noise
+  v += (Math.random() - 0.5) * 0.05;
+
+  return v;
+}
+
+// Rolling buffer of waveform samples displayed on canvas
+const WAVE_DURATION = 2.5; // seconds visible at a time
+const SAMPLE_RATE = 200;   // samples per second for display
+const BUFFER_SIZE = WAVE_DURATION * SAMPLE_RATE;
+let waveBuffer = new Array(BUFFER_SIZE).fill(0);
+let bufferIndex = 0;
+
+function drawWaveform() {
+  const w = canvas.getBoundingClientRect().width;
+  const h = canvas.getBoundingClientRect().height;
+  ctx.clearRect(0, 0, w, h);
+
+  // Background grid
+  ctx.strokeStyle = '#1a1a1a';
+  ctx.lineWidth = 0.5;
+  for (let i = 1; i < 4; i++) {
+    const y = h * i / 4;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(w, y);
+    ctx.stroke();
+  }
+
+  // Center line
+  ctx.strokeStyle = '#2a2a2a';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, h / 2);
+  ctx.lineTo(w, h / 2);
+  ctx.stroke();
+
+  // Waveform glow underlay
+  ctx.strokeStyle = 'rgba(74,158,255,0.25)';
+  ctx.lineWidth = 6;
+  ctx.beginPath();
+  for (let i = 0; i < BUFFER_SIZE; i++) {
+    const readIdx = (bufferIndex + i) % BUFFER_SIZE;
+    const x = (i / BUFFER_SIZE) * w;
+    const y = h / 2 - waveBuffer[readIdx] * h * 0.38;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // Waveform sharp line
+  ctx.strokeStyle = '#4A9EFF';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  for (let i = 0; i < BUFFER_SIZE; i++) {
+    const readIdx = (bufferIndex + i) % BUFFER_SIZE;
+    const x = (i / BUFFER_SIZE) * w;
+    const y = h / 2 - waveBuffer[readIdx] * h * 0.38;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // S1/S2 annotations — only if we're acquiring
+  if (currentState === STATE.ACQUIRING || currentState === STATE.INFERRING || currentState === STATE.CONFIRMED) {
+    ctx.fillStyle = '#666';
+    ctx.font = '9px "Courier New", monospace';
+    // Just hint at the beat markers
+    const t = (performance.now() - examStartTime) / 1000;
+    if (t > 1) {
+      ctx.fillText('S1', 10, 24);
+      ctx.fillText('S2', 10, h - 10);
+    }
+  }
+}
+
+// ============ EXAM SIMULATION ============
+const probTargets = {
+  idle:      [0, 0, 0, 0, 0],
+  acquiring: [0.18, 0.92, 0.04, 0.02, 0.03], // grows toward this
+};
+let currentProbs = [0, 0, 0, 0, 0];
+
+function updateUI() {
+  const now = performance.now();
+  const elapsed = examStartTime ? (now - examStartTime) / 1000 : 0;
+
+  // === Advance waveform buffer ===
+  if (currentState === STATE.ACQUIRING || currentState === STATE.INFERRING) {
+    // Push new samples into the rolling buffer at real time
+    const dt = 1 / 60; // 60fps
+    const samplesThisFrame = Math.ceil(dt * SAMPLE_RATE);
+    for (let i = 0; i < samplesThisFrame; i++) {
+      const t = elapsed + i / SAMPLE_RATE;
+      waveBuffer[bufferIndex] = pcgValue(t);
+      bufferIndex = (bufferIndex + 1) % BUFFER_SIZE;
+    }
+  } else {
+    // When idle/confirmed, keep the last frame visible (no more scrolling)
+    // but decay to flatline when truly idle
+    if (currentState === STATE.IDLE) {
+      for (let i = 0; i < waveBuffer.length; i++) {
+        waveBuffer[i] *= 0.92;
+      }
+    }
+  }
+
+  drawWaveform();
+
+  // === Timestamp ===
+  const ts = document.getElementById('timestamp');
+  if (currentState === STATE.ACQUIRING) {
+    const secs = Math.floor(elapsed);
+    ts.textContent = `00:00:${String(secs).padStart(2,'0')} · streaming`;
+  } else if (currentState === STATE.INFERRING) {
+    ts.textContent = `00:00:${String(Math.floor(elapsed)).padStart(2,'0')} · inferring`;
+  } else if (currentState === STATE.CONFIRMED) {
+    ts.textContent = `00:00:12 · captured`;
+  } else {
+    ts.textContent = `00:00:00 · idle`;
+  }
+
+  // === Live stats ramp up over first 3 seconds ===
+  if (currentState === STATE.ACQUIRING || currentState === STATE.INFERRING || currentState === STATE.CONFIRMED) {
+    const rampT = Math.min(elapsed / 2.5, 1);
+    // HR
+    const hr = Math.round(72 + rampT * 6);
+    document.getElementById('statHR').textContent = hr;
+    document.getElementById('hrExtra').textContent = 'avg 3s window';
+
+    // Rhythm
+    if (rampT > 0.4) {
+      document.getElementById('statRhythm').textContent = 'Regular';
+      document.getElementById('rhythmExtra').innerHTML = '<span style="color:var(--success)">✓ sinus pattern</span><br>variance: 3.2%';
+    }
+
+    // SNR
+    const snr = Math.round(rampT * 64);
+    document.getElementById('statSNR').textContent = snr;
+    document.getElementById('snrBar').style.width = (rampT * 84) + '%';
+
+    // Battery
+    document.getElementById('statBatt').textContent = 'BATT 91%';
+    document.getElementById('battExtra').innerHTML = 'NPU TEMP · 38.2°C<br>BLE RSSI · -52 dBm';
+  }
+
+  // === ML confidence bars ===
+  // Start building after 3s (sensors have enough data), finalize at 6s
+  if (elapsed > 3 && elapsed < 6) {
+    const t = (elapsed - 3) / 3; // 0..1 over the inference window
+    for (let i = 0; i < 5; i++) {
+      currentProbs[i] = probTargets.acquiring[i] * easeOut(t);
+    }
+    updateProbBars();
+
+    document.getElementById('mlStatus').className = 'ml-status processing';
+    document.getElementById('mlStatusText').textContent = 'PROCESSING';
+    document.getElementById('inferTime').textContent = Math.round(t * 47) + ' ms';
+    document.getElementById('powerDraw').textContent = Math.round(t * 87) + ' mW';
+  }
+
+  if (elapsed >= 6 && currentState === STATE.ACQUIRING) {
+    // Transition to confirmed state
+    transitionToConfirmed();
+  }
+
+  animationFrame = requestAnimationFrame(updateUI);
+}
+
+function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+function updateProbBars() {
+  for (let i = 0; i < 5; i++) {
+    const bar = document.getElementById(`p${i}`);
+    const val = document.getElementById(`p${i}v`);
+    bar.style.width = (currentProbs[i] * 100) + '%';
+    val.textContent = currentProbs[i].toFixed(2);
+    if (i === 1 && currentProbs[i] > 0.5) {
+      bar.classList.add('highlight');
+      val.classList.add('highlight');
+    } else {
+      bar.classList.remove('highlight');
+      val.classList.remove('highlight');
+    }
+  }
+}
+
+// ============ STATE TRANSITIONS ============
+function startExam() {
+  currentState = STATE.ACQUIRING;
+  examStartTime = performance.now();
+  waveBuffer = new Array(BUFFER_SIZE).fill(0);
+  bufferIndex = 0;
+  currentProbs = [0, 0, 0, 0, 0];
+  updateProbBars();
+
+  // Left panel
+  document.getElementById('leftLabelText').textContent = 'LIVE · ACQUIRING';
+  document.getElementById('liveDot').classList.add('pulse');
+
+  // Waveform indicator
+  document.getElementById('waveIndicator').className = 'wave-indicator streaming';
+  document.getElementById('recDot').style.display = 'block';
+  document.getElementById('recDot').classList.add('blink');
+
+  // ML panel
+  document.getElementById('mlStatus').className = 'ml-status processing';
+  document.getElementById('mlStatusText').textContent = 'WAITING';
+
+  // Right panel — clear out previous
+  document.getElementById('rightLabel').className = 'panel-label pending';
+  document.getElementById('rightLabelText').textContent = '⦿ PENDING FINDING';
+  document.getElementById('findingCard').classList.add('idle');
+  document.getElementById('findingLabel').textContent = 'AWAITING INFERENCE';
+  document.getElementById('findingHeadline').textContent = 'Analyzing heart sounds...';
+  document.getElementById('findingSub').textContent = '';
+  document.getElementById('findingActions').style.display = 'none';
+  document.getElementById('findingNote').style.display = 'none';
+  document.getElementById('findingTimestamp').style.display = 'none';
+  document.getElementById('fhirCard').classList.add('idle');
+  document.getElementById('fhirBody').innerHTML = '<pre style="font-family:inherit;color:var(--muted-2);font-style:italic">Analyzing... waiting for inference to complete.</pre>';
+  document.getElementById('fhirSize').textContent = 'size: — bytes';
+  document.getElementById('fhirSynced').style.display = 'none';
+
+  // Controls
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('startBtn').textContent = '◉ EXAM IN PROGRESS';
+  document.getElementById('statusText').textContent = 'acquiring auscultation';
+
+  if (!animationFrame) animationFrame = requestAnimationFrame(updateUI);
+}
+
+function transitionToConfirmed() {
+  currentState = STATE.CONFIRMED;
+
+  // Left panel
+  document.getElementById('leftLabelText').textContent = 'COMPLETE · CAPTURED';
+  document.getElementById('liveDot').classList.remove('pulse');
+  document.getElementById('waveIndicator').className = 'wave-indicator idle';
+  document.getElementById('recDot').classList.remove('blink');
+  document.getElementById('recDot').style.display = 'none';
+
+  // ML panel
+  document.getElementById('mlStatus').className = 'ml-status complete';
+  document.getElementById('mlStatusText').textContent = 'COMPLETE · 47ms';
+  document.getElementById('inferTime').textContent = '47 ms';
+  document.getElementById('powerDraw').textContent = '87 mW';
+
+  // Right panel — reveal finding with animation
+  setTimeout(() => {
+    document.getElementById('rightLabel').className = 'panel-label confirmed';
+    document.getElementById('rightLabelText').textContent = '✓ FINDING · CONFIRMED';
+    document.getElementById('findingCard').classList.remove('idle');
+    document.getElementById('findingLabel').textContent = 'AI FINDING · PHYSICIAN CONFIRMED';
+    document.getElementById('findingHeadline').textContent = 'Systolic ejection murmur';
+    document.getElementById('findingSub').textContent = 'Grade II/VI · left upper sternal border · consistent with aortic valve';
+    document.getElementById('findingActions').style.display = 'flex';
+    document.getElementById('findingNote').style.display = 'block';
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' EST';
+    document.getElementById('findingTime').textContent = 'CONFIRMED · ' + timeStr;
+    document.getElementById('findingTimestamp').style.display = 'block';
+  }, 400);
+
+  // FHIR JSON — reveal after a brief delay, then stream in
+  setTimeout(() => {
+    document.getElementById('fhirCard').classList.remove('idle');
+    streamFhirJson();
+  }, 900);
+
+  // Controls
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('startBtn').textContent = '▶ RUN AGAIN';
+  document.getElementById('statusText').textContent = 'finding confirmed · synced to EHR';
+}
+
+function resetExam() {
+  currentState = STATE.IDLE;
+  examStartTime = 0;
+  waveBuffer = new Array(BUFFER_SIZE).fill(0);
+  currentProbs = [0, 0, 0, 0, 0];
+  updateProbBars();
+
+  document.getElementById('leftLabelText').textContent = 'IDLE · READY';
+  document.getElementById('liveDot').classList.remove('pulse');
+  document.getElementById('waveIndicator').className = 'wave-indicator idle';
+  document.getElementById('recDot').classList.remove('blink');
+  document.getElementById('recDot').style.display = 'none';
+  document.getElementById('timestamp').textContent = '00:00:00 · idle';
+
+  document.getElementById('statHR').textContent = '—';
+  document.getElementById('hrExtra').textContent = 'awaiting signal';
+  document.getElementById('statRhythm').textContent = '—';
+  document.getElementById('rhythmExtra').textContent = 'awaiting signal';
+  document.getElementById('statSNR').textContent = '—';
+  document.getElementById('snrBar').style.width = '0%';
+
+  document.getElementById('mlStatus').className = 'ml-status idle';
+  document.getElementById('mlStatusText').textContent = 'IDLE';
+  document.getElementById('inferTime').textContent = '— ms';
+  document.getElementById('powerDraw').textContent = '— mW';
+
+  document.getElementById('rightLabel').className = 'panel-label pending';
+  document.getElementById('rightLabelText').textContent = '⦿ PENDING FINDING';
+  document.getElementById('findingCard').classList.add('idle');
+  document.getElementById('findingLabel').textContent = 'AWAITING INFERENCE';
+  document.getElementById('findingHeadline').textContent = 'Start an exam to begin auscultation...';
+  document.getElementById('findingSub').textContent = '';
+  document.getElementById('findingActions').style.display = 'none';
+  document.getElementById('findingNote').style.display = 'none';
+  document.getElementById('findingTimestamp').style.display = 'none';
+
+  document.getElementById('fhirCard').classList.add('idle');
+  document.getElementById('fhirBody').innerHTML = '<pre style="font-family:inherit;color:var(--muted-2);font-style:italic">No finding yet. Start an exam to generate the FHIR Observation.</pre>';
+  document.getElementById('fhirSize').textContent = 'size: — bytes';
+  document.getElementById('fhirSynced').style.display = 'none';
+
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('startBtn').textContent = '▶ START EXAM';
+  document.getElementById('statusText').textContent = 'ready';
+
+  if (animationFrame) {
+    cancelAnimationFrame(animationFrame);
+    animationFrame = null;
+  }
+}
+
+// ============ FHIR JSON STREAM ============
+function streamFhirJson() {
+  const now = new Date();
+  const iso = now.toISOString().replace('Z', '-05:00');
+
+  const fhir = {
+    resourceType: "Observation",
+    id: "galen-obs-" + Math.random().toString(36).substring(2, 8),
+    status: "final",
+    category: [{
+      coding: [{
+        system: "http://terminology.hl7.org/CodeSystem/observation-category",
+        code: "vital-signs"
+      }]
+    }],
+    code: {
+      coding: [{
+        system: "http://loinc.org",
+        code: "89021-1",
+        display: "Heart murmur by auscultation"
+      }]
+    },
+    subject: { reference: "Patient/88420" },
+    effectiveDateTime: iso,
+    valueCodeableConcept: {
+      coding: [{
+        system: "http://arx.systems/galen/findings",
+        code: "systolic-ejection-murmur",
+        display: "Systolic ejection murmur"
+      }]
+    },
+    interpretation: [{
+      coding: [{
+        system: "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+        code: "A",
+        display: "abnormal"
+      }]
+    }],
+    method: {
+      text: "on-device-cnn-v0.3.1"
+    },
+    device: { reference: "Device/galen-stethoscope-v0.1" },
+    extension: [{
+      url: "http://arx.systems/fhir/StructureDefinition/ml-confidence",
+      valueDecimal: 0.92
+    }],
+    performer: [{ reference: "Practitioner/cespedes-e" }]
+  };
+
+  const jsonText = JSON.stringify(fhir, null, 2);
+  const sizeBytes = new Blob([jsonText]).size;
+  document.getElementById('fhirSize').textContent = `size: ${sizeBytes} bytes`;
+
+  // Stream the JSON character-by-character with syntax highlighting
+  const body = document.getElementById('fhirBody');
+  const highlighted = highlightJson(jsonText);
+  body.innerHTML = '';
+  let i = 0;
+  const streamInterval = setInterval(() => {
+    const chunk = 40;
+    const nextI = Math.min(i + chunk, highlighted.length);
+    body.innerHTML = highlighted.substring(0, nextI);
+    i = nextI;
+    // Auto-scroll to bottom
+    const scroller = body.parentElement;
+    scroller.scrollTop = scroller.scrollHeight;
+    if (i >= highlighted.length) {
+      clearInterval(streamInterval);
+      document.getElementById('fhirSynced').style.display = 'inline';
+    }
+  }, 12);
+
+  // Store raw json for copy
+  body.dataset.raw = jsonText;
+}
+
+function highlightJson(str) {
+  return '<pre style="font-family:inherit;margin:0;white-space:pre-wrap;word-break:break-word">' +
+    str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"([^"]+)":/g, '<span style="color:var(--muted)">"$1"</span>:')
+      .replace(/: "([^"]+)"/g, ': <span style="color:var(--gold)">"$1"</span>')
+      .replace(/: (\d+\.?\d*)/g, ': <span style="color:var(--gold)">$1</span>') +
+    '</pre>';
+}
+
+// ============ EVENT WIRING ============
+document.getElementById('startBtn').addEventListener('click', () => {
+  if (currentState === STATE.IDLE || currentState === STATE.CONFIRMED) {
+    startExam();
+  }
+});
+
+document.getElementById('resetBtn').addEventListener('click', resetExam);
+
+document.getElementById('overrideToggle').addEventListener('click', (e) => {
+  e.currentTarget.classList.toggle('active');
+  const active = e.currentTarget.classList.contains('active');
+  const headline = document.getElementById('findingHeadline');
+  const sub = document.getElementById('findingSub');
+  const label = document.getElementById('findingLabel');
+  if (active) {
+    headline.textContent = 'Finding overridden by physician';
+    headline.style.color = 'var(--danger)';
+    sub.textContent = 'Physician review flagged AI finding — manual documentation required.';
+    label.textContent = 'AI FINDING · PHYSICIAN OVERRIDE';
+    label.style.color = 'var(--danger)';
+  } else {
+    headline.textContent = 'Systolic ejection murmur';
+    headline.style.color = '';
+    sub.textContent = 'Grade II/VI · left upper sternal border · consistent with aortic valve';
+    label.textContent = 'AI FINDING · PHYSICIAN CONFIRMED';
+    label.style.color = '';
+  }
+});
+
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const raw = document.getElementById('fhirBody').dataset.raw;
+  if (!raw) return;
+  try {
+    await navigator.clipboard.writeText(raw);
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ COPIED';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'COPY';
+      btn.classList.remove('copied');
+    }, 1500);
+  } catch(e) {
+    console.warn('Clipboard failed:', e);
+  }
+});
+
+// Start with a gentle baseline draw
+drawWaveform();
+</script>
+</body>
+</html>
